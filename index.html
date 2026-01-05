@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Watch Sheet</title>
+    <style>
+        /* Apple Watch 極簡黑底風格 */
+        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 10px; text-align: center; }
+        
+        /* 載入與錯誤訊息 */
+        #loading { color: #0A84FF; font-weight: bold; margin-top: 50px; font-size: 18px; }
+        .error-msg { color: #ff453a; margin-top: 20px; font-size: 16px; }
+
+        /* 登入區塊 */
+        #login-box { margin-top: 40px; }
+        .login-input { width: 80%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1c1c1e; color: white; font-size: 18px; text-align: center; margin-bottom: 15px; }
+        .login-btn { width: 80%; padding: 12px; background: #00c300; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; }
+
+        /* 表格與按鈕樣式 (維持原樣) */
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
+        table { border-collapse: collapse; width: 100%; white-space: nowrap; }
+        th { background-color: #1c1c1e; color: #0A84FF; padding: 10px; border-bottom: 2px solid #333; position: sticky; top: 0; text-align: left; }
+        td { padding: 12px 10px; border-bottom: 1px solid #333; font-size: 16px; text-align: left; }
+        tr:nth-child(even) { background-color: #111; }
+        th:first-child, td:first-child { min-width: 100px; color: #00c300; font-weight: bold; position: sticky; left: 0; background-color: #000; z-index: 1; }
+        tr:nth-child(even) td:first-child { background-color: #111; } 
+
+        .nav-box { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0; }
+        button { flex: 1; padding: 12px; background: #333; color: white; border: 1px solid #555; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:active { background: #555; }
+        button:disabled { opacity: 0.3; }
+        .refresh-btn { width: 100%; background: #0A84FF; border: none; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. 登入畫面 -->
+    <div id="login-box" style="display:none;">
+        <h3>🔒 請輸入存取密碼</h3>
+        <input type="password" id="secretInput" class="login-input" placeholder="密碼">
+        <br>
+        <button onclick="saveSecret()" class="login-btn">解鎖資料</button>
+    </div>
+
+    <!-- 2. 狀態區 -->
+    <div id="loading" style="display:none;">正在連線...</div>
+
+    <!-- 3. 資料顯示區 -->
+    <div id="content" style="display:none;">
+        <div class="nav-box">
+            <button id="prevBtn" onclick="changePage(-1)">⬅️</button>
+            <span id="pageInfo" style="line-height: 45px; font-size: 14px; color: #888;"></span>
+            <button id="nextBtn" onclick="changePage(1)">➡️</button>
+        </div>
+
+        <div class="table-container">
+            <table id="dataTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <button class="refresh-btn" onclick="fetchData()">🔄 重新整理</button>
+        <button onclick="logout()" style="margin-top:20px; background:#333; border:none; font-size:14px; color:#888;">登出 / 清除密碼</button>
+    </div>
+
+    <script>
+        // ==========================================
+        // 【設定區】請填入您的 GAS 網址
+        // ==========================================
+        const GAS_URL = "請貼上您的_GAS_WEB_APP_URL_exec結尾"; 
+        
+        let currentPage = -1;
+        let userToken = "";
+
+        // 初始化：檢查是否有存過密碼
+        window.onload = () => {
+            const savedToken = localStorage.getItem("sheet_token");
+            if (savedToken) {
+                userToken = savedToken;
+                fetchData();
+            } else {
+                showLogin();
+            }
+        };
+
+        function showLogin() {
+            document.getElementById('login-box').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function saveSecret() {
+            const input = document.getElementById('secretInput').value;
+            if (!input) return alert("請輸入密碼");
+            
+            userToken = input;
+            localStorage.setItem("sheet_token", userToken); // 儲存密碼到瀏覽器
+            fetchData();
+        }
+
+        function logout() {
+            localStorage.removeItem("sheet_token");
+            location.reload();
+        }
+
+        function fetchData(page = null) {
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            document.getElementById('loading').innerText = "下載數據中...";
+
+            // 組合 API 網址 (加上 mode=api 和 token)
+            let url = `${GAS_URL}?mode=api&token=${encodeURIComponent(userToken)}`;
+            if (page) url += `&page=${page}`;
+
+            fetch(url)
+            .then(response => response.json())
+            .then(json => {
+                if (json.status === 'success') {
+                    renderTable(json);
+                } else if (json.status === 'error') {
+                    document.getElementById('loading').innerHTML = `<div class="error-msg">${json.message}</div>`;
+                    // 如果是密碼錯誤，延遲後跳回登入頁
+                    if(json.message.includes("密碼錯誤")) {
+                        setTimeout(() => { localStorage.removeItem("sheet_token"); showLogin(); }, 2000);
+                    }
+                } else if (json.status === 'empty') {
+                    document.getElementById('loading').innerText = "試算表是空的";
+                }
+            })
+            .catch(err => {
+                document.getElementById('loading').innerHTML = `<span style="color:red">連線失敗</span><br><small>${err}</small>`;
+                console.error(err);
+            });
+        }
+
+        function renderTable(data) {
+            currentPage = data.currentPage;
+            
+            let theadHtml = "<tr>";
+            data.header.forEach(h => theadHtml += `<th>${h}</th>`);
+            theadHtml += "</tr>";
+            document.getElementById('tableHead').innerHTML = theadHtml;
+
+            let tbodyHtml = "";
+            data.body.forEach(row => {
+                tbodyHtml += "<tr>";
+                row.forEach(cell => tbodyHtml += `<td>${cell}</td>`);
+                tbodyHtml += "</tr>";
+            });
+            document.getElementById('tableBody').innerHTML = tbodyHtml;
+
+            document.getElementById('pageInfo').innerText = `${data.currentPage} / ${data.totalPages}`;
+            document.getElementById('prevBtn').disabled = (data.currentPage <= 1);
+            document.getElementById('nextBtn').disabled = (data.currentPage >= data.totalPages);
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+
+        function changePage(delta) {
+            fetchData(currentPage + delta);
+        }
+    </script>
+</body>
+</html>
