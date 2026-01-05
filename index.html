@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 修正 Favicon 404 錯誤 -->
+    <link rel="icon" href="data:,">
     <title>Watch Sheet</title>
     <style>
         /* =========================================
@@ -18,11 +20,10 @@
             text-align: center; 
         }
         
-        /* 載入與錯誤訊息 (加大) */
         #loading { color: #0A84FF; font-weight: bold; margin-top: 50px; font-size: 24px; }
-        .error-msg { color: #ff453a; margin-top: 20px; font-size: 20px; }
+        .error-msg { color: #ff453a; margin-top: 20px; font-size: 20px; word-break: break-word; }
 
-        /* 登入區塊 (加大) */
+        /* 登入區塊 */
         #login-box { margin-top: 40px; }
         h3 { font-size: 24px; margin-bottom: 20px; color: #00c300; }
         .login-input { 
@@ -32,7 +33,7 @@
             border: 2px solid #333; 
             background: #1c1c1e; 
             color: white; 
-            font-size: 24px; /* 輸入框字體加大 */
+            font-size: 24px; 
             text-align: center; 
             margin-bottom: 20px; 
         }
@@ -44,10 +45,10 @@
             border-radius: 12px; 
             color: white; 
             font-weight: bold; 
-            font-size: 24px; /* 按鈕字體加大 */
+            font-size: 24px; 
         }
 
-        /* 表格樣式 (核心修改區) */
+        /* 表格樣式 */
         .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
         table { border-collapse: collapse; width: 100%; white-space: nowrap; }
         
@@ -59,43 +60,48 @@
             position: sticky; 
             top: 0; 
             text-align: left;
-            font-size: 20px; /* 標題字體加大 (原14px) */
+            font-size: 20px; 
         }
         
         td { 
-            padding: 15px 10px; /* 增加間距 */
+            padding: 15px 10px; 
             border-bottom: 1px solid #333; 
-            font-size: 22px; /* 內容字體大幅加大 (原16px) */
+            font-size: 22px; 
             text-align: left; 
             line-height: 1.4;
         }
         
         tr:nth-child(even) { background-color: #111; }
 
-        /* A欄加寬設定 */
+        /* A欄樣式調整：縮減寬度並允許換行 */
         th:first-child, td:first-child { 
-            min-width: 120px; /* 寬度稍微加寬 */
+            min-width: 60px;  /* 寬度減半 */
+            max-width: 70px;  /* 限制最大寬度 */
             color: #00c300; 
             font-weight: bold; 
             position: sticky; 
             left: 0; 
             background-color: #000; 
             z-index: 1; 
-            font-size: 22px; /* A欄字體加大 */
+            font-size: 20px; /* 字體微調 */
+            white-space: normal; /* 允許文字換行 */
+            word-wrap: break-word; /* 長單字換行 */
+            word-break: break-all; /* 強制切斷過長字串 */
+            vertical-align: middle;
         }
         tr:nth-child(even) td:first-child { background-color: #111; } 
 
-        /* 按鈕區 (加大) */
+        /* 按鈕區 */
         .nav-box { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0; }
         
         button { 
             flex: 1; 
-            padding: 15px; /* 按鈕變大好按 */
+            padding: 15px; 
             background: #333; 
             color: white; 
             border: 1px solid #555; 
             border-radius: 12px; 
-            font-size: 24px; /* 箭頭變大 */
+            font-size: 24px; 
             font-weight: bold; 
             cursor: pointer; 
         }
@@ -108,19 +114,18 @@
             border: none; 
             margin-top: 20px; 
             padding: 15px;
-            font-size: 20px; /* 重新整理字體加大 */
+            font-size: 20px; 
         }
         
         #pageInfo {
-            line-height: 60px; /* 配合按鈕高度垂直置中 */
-            font-size: 18px; /* 頁碼字體加大 */
+            line-height: 60px; 
+            font-size: 18px; 
             color: #aaa;
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. 登入畫面 -->
     <div id="login-box" style="display:none;">
         <h3>🔒 請輸入存取密碼</h3>
         <input type="password" id="secretInput" class="login-input" placeholder="密碼">
@@ -128,10 +133,8 @@
         <button onclick="saveSecret()" class="login-btn">解鎖資料</button>
     </div>
 
-    <!-- 2. 狀態區 -->
     <div id="loading" style="display:none;">正在連線...</div>
 
-    <!-- 3. 資料顯示區 -->
     <div id="content" style="display:none;">
         <div class="nav-box">
             <button id="prevBtn" onclick="changePage(-1)">⬅️</button>
