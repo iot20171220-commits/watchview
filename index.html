@@ -5,32 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Watch Sheet</title>
     <style>
-        /* Apple Watch 極簡黑底風格 */
-        body { background-color: #000; color: #fff; font-family: -apple-system, sans-serif; margin: 0; padding: 10px; text-align: center; }
+        /* =========================================
+           Apple Watch 大字體優化版 CSS
+           ========================================= */
         
-        /* 載入與錯誤訊息 */
-        #loading { color: #0A84FF; font-weight: bold; margin-top: 50px; font-size: 18px; }
-        .error-msg { color: #ff453a; margin-top: 20px; font-size: 16px; }
+        body { 
+            background-color: #000; 
+            color: #fff; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; 
+            padding: 5px; 
+            text-align: center; 
+        }
+        
+        /* 載入與錯誤訊息 (加大) */
+        #loading { color: #0A84FF; font-weight: bold; margin-top: 50px; font-size: 24px; }
+        .error-msg { color: #ff453a; margin-top: 20px; font-size: 20px; }
 
-        /* 登入區塊 */
+        /* 登入區塊 (加大) */
         #login-box { margin-top: 40px; }
-        .login-input { width: 80%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #1c1c1e; color: white; font-size: 18px; text-align: center; margin-bottom: 15px; }
-        .login-btn { width: 80%; padding: 12px; background: #00c300; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 18px; }
+        h3 { font-size: 24px; margin-bottom: 20px; color: #00c300; }
+        .login-input { 
+            width: 90%; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 2px solid #333; 
+            background: #1c1c1e; 
+            color: white; 
+            font-size: 24px; /* 輸入框字體加大 */
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        .login-btn { 
+            width: 90%; 
+            padding: 15px; 
+            background: #00c300; 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 24px; /* 按鈕字體加大 */
+        }
 
-        /* 表格與按鈕樣式 (維持原樣) */
+        /* 表格樣式 (核心修改區) */
         .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 10px; }
         table { border-collapse: collapse; width: 100%; white-space: nowrap; }
-        th { background-color: #1c1c1e; color: #0A84FF; padding: 10px; border-bottom: 2px solid #333; position: sticky; top: 0; text-align: left; }
-        td { padding: 12px 10px; border-bottom: 1px solid #333; font-size: 16px; text-align: left; }
+        
+        th { 
+            background-color: #1c1c1e; 
+            color: #0A84FF; 
+            padding: 12px 10px; 
+            border-bottom: 2px solid #333; 
+            position: sticky; 
+            top: 0; 
+            text-align: left;
+            font-size: 20px; /* 標題字體加大 (原14px) */
+        }
+        
+        td { 
+            padding: 15px 10px; /* 增加間距 */
+            border-bottom: 1px solid #333; 
+            font-size: 22px; /* 內容字體大幅加大 (原16px) */
+            text-align: left; 
+            line-height: 1.4;
+        }
+        
         tr:nth-child(even) { background-color: #111; }
-        th:first-child, td:first-child { min-width: 100px; color: #00c300; font-weight: bold; position: sticky; left: 0; background-color: #000; z-index: 1; }
+
+        /* A欄加寬設定 */
+        th:first-child, td:first-child { 
+            min-width: 120px; /* 寬度稍微加寬 */
+            color: #00c300; 
+            font-weight: bold; 
+            position: sticky; 
+            left: 0; 
+            background-color: #000; 
+            z-index: 1; 
+            font-size: 22px; /* A欄字體加大 */
+        }
         tr:nth-child(even) td:first-child { background-color: #111; } 
 
+        /* 按鈕區 (加大) */
         .nav-box { display: flex; justify-content: space-between; gap: 10px; margin: 15px 0; }
-        button { flex: 1; padding: 12px; background: #333; color: white; border: 1px solid #555; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        
+        button { 
+            flex: 1; 
+            padding: 15px; /* 按鈕變大好按 */
+            background: #333; 
+            color: white; 
+            border: 1px solid #555; 
+            border-radius: 12px; 
+            font-size: 24px; /* 箭頭變大 */
+            font-weight: bold; 
+            cursor: pointer; 
+        }
         button:active { background: #555; }
         button:disabled { opacity: 0.3; }
-        .refresh-btn { width: 100%; background: #0A84FF; border: none; margin-top: 20px; }
+        
+        .refresh-btn { 
+            width: 100%; 
+            background: #0A84FF; 
+            border: none; 
+            margin-top: 20px; 
+            padding: 15px;
+            font-size: 20px; /* 重新整理字體加大 */
+        }
+        
+        #pageInfo {
+            line-height: 60px; /* 配合按鈕高度垂直置中 */
+            font-size: 18px; /* 頁碼字體加大 */
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -50,7 +135,7 @@
     <div id="content" style="display:none;">
         <div class="nav-box">
             <button id="prevBtn" onclick="changePage(-1)">⬅️</button>
-            <span id="pageInfo" style="line-height: 45px; font-size: 14px; color: #888;"></span>
+            <span id="pageInfo"></span>
             <button id="nextBtn" onclick="changePage(1)">➡️</button>
         </div>
 
@@ -62,14 +147,14 @@
         </div>
 
         <button class="refresh-btn" onclick="fetchData()">🔄 重新整理</button>
-        <button onclick="logout()" style="margin-top:20px; background:#333; border:none; font-size:14px; color:#888;">登出 / 清除密碼</button>
+        <button onclick="logout()" style="margin-top:30px; background:#333; border:none; font-size:16px; color:#888; padding:10px;">登出 / 清除密碼</button>
     </div>
 
     <script>
         // ==========================================
-        // 【設定區】請填入您的 GAS 網址
+        // 【設定區】請填入您的 GAS 網址 (無需修改，沿用您舊的即可)
         // ==========================================
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwjNGgW4V5o9A0Baei2S8dYY7CWxHZx6CsGV_2H4whGIwduPsflHNqYdYtNEbeHPYJ-zw/exec"; 
+        "https://script.google.com/macros/s/AKfycbwjNGgW4V5o9A0Baei2S8dYY7CWxHZx6CsGV_2H4whGIwduPsflHNqYdYtNEbeHPYJ-zw/exec"; 
         
         let currentPage = -1;
         let userToken = "";
@@ -122,7 +207,6 @@
                     renderTable(json);
                 } else if (json.status === 'error') {
                     document.getElementById('loading').innerHTML = `<div class="error-msg">${json.message}</div>`;
-                    // 如果是密碼錯誤，延遲後跳回登入頁
                     if(json.message.includes("密碼錯誤")) {
                         setTimeout(() => { localStorage.removeItem("sheet_token"); showLogin(); }, 2000);
                     }
